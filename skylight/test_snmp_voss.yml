@@ -1,0 +1,71 @@
+---
+- name: "Test SNMP configuration on Extreme VOSS switches"
+  hosts: extreme_voss
+  gather_facts: no
+  connection: network_cli
+  tasks:
+    - name: Check current SNMP view configuration
+      community.network.voss_command:
+        commands:
+          - show snmp-server view
+      register: snmp_view
+
+    - name: Display SNMP view
+      debug:
+        msg: "{{ snmp_view.stdout_lines }}"
+
+    - name: Check SNMP group configuration
+      community.network.voss_command:
+        commands:
+          - show snmp-server group
+      register: snmp_group
+
+    - name: Display SNMP group
+      debug:
+        msg: "{{ snmp_group.stdout_lines }}"
+
+    - name: Check SNMP community configuration
+      community.network.voss_command:
+        commands:
+          - show snmp-server community
+      register: snmp_community
+
+    - name: Display SNMP community
+      debug:
+        msg: "{{ snmp_community.stdout_lines }}"
+
+    - name: Check SNMP host configuration
+      community.network.voss_command:
+        commands:
+          - show snmp-server host
+      register: snmp_host
+
+    - name: Display SNMP host
+      debug:
+        msg: "{{ snmp_host.stdout_lines }}"
+
+    - name: Test SNMP from monitoring server (on localhost)
+      shell: |
+        snmpwalk -v2c -c public {{ ansible_host }} system
+      register: snmp_test
+      delegate_to: localhost
+      ignore_errors: yes
+
+    - name: Display SNMP test result
+      debug:
+        msg: |
+          SNMP Test from 192.168.0.139:
+          {{ 'SUCCESS - SNMP responding' if snmp_test.rc == 0 else 'FAILED - Check firewall/SNMP config' }}
+          Output: {{ snmp_test.stdout_lines | default(['No output']) }}
+
+    - name: Summary
+      debug:
+        msg:
+          - "========== SNMP Configuration Summary =========="
+          - "Switch: {{ inventory_hostname }}"
+          - "IP: {{ ansible_host }}"
+          - "SNMP View: Check output above"
+          - "SNMP Group: Check output above"
+          - "SNMP Community: public"
+          - "SNMP Host: 192.168.0.139"
+          - "Test from monitoring server: {{ 'OK' if snmp_test.rc == 0 else 'FAILED' }}"

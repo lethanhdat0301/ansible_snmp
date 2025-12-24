@@ -1,0 +1,33 @@
+---
+- name: "Configure SNMP on Extreme VOSS switches"
+  hosts: extreme_voss
+  gather_facts: no
+  connection: network_cli
+  tasks:
+    - name: Configure SNMP settings
+      community.network.voss_config:
+        lines:
+          - snmp-server view allview 1
+          - snmp-server group rogroup v2c no-auth-no-priv read-view allview
+          - snmp-server community public group rogroup
+          - snmp-server host 192.168.0.139 v2c public
+          - snmp-server authentication-trap enable
+        save_when: changed
+      register: snmp_config
+
+    - name: Display configuration result
+      debug:
+        msg: "SNMP configuration {{ 'applied successfully' if snmp_config.changed else 'already present' }}"
+
+    - name: Verify SNMP configuration
+      community.network.voss_command:
+        commands:
+          - show snmp-server view
+          - show snmp-server group
+          - show snmp-server community
+          - show snmp-server host
+      register: snmp_verify
+
+    - name: Display SNMP configuration
+      debug:
+        var: snmp_verify.stdout_lines
