@@ -29,17 +29,7 @@
       debug:
         msg: "{{ running_config.stdout_lines[0][:20] }}"
 
-    - name: Test 4 - Run 'show version'
-      community.network.voss_command:
-        commands:
-          - show version
-      register: version_info
-
-    - name: Display version
-      debug:
-        var: version_info.stdout_lines
-
-    - name: Test 5 - Check if backup directory is accessible
+    - name: Test 4 - Check if backup directory is accessible
       stat:
         path: "/home/backups"
       register: backup_dir
