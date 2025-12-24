@@ -1,0 +1,30 @@
+---
+- name: "Backup config Extreme VOSS switches"
+  hosts: extreme_voss
+  gather_facts: no
+  connection: network_cli
+  tasks:
+    - name: Get timestamp
+      command: date +%d-%m-%Y
+      register: timestamp
+      delegate_to: localhost
+      run_once: true
+
+    - name: Create backup directory if not exists
+      file:
+        path: "/home/backups/{{ inventory_hostname }}"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+
+    - name: Backup VOSS running config
+      community.network.voss_config:
+        backup: yes
+        backup_options:
+          filename: "{{ inventory_hostname }}-{{ timestamp.stdout }}"
+          dir_path: "/home/backups/{{ inventory_hostname }}"
+      register: backup_output
+
+    - name: Display backup location
+      debug:
+        msg: "Backup saved to: /home/backups/{{ inventory_hostname }}/{{ inventory_hostname }}-{{ timestamp.stdout }}"

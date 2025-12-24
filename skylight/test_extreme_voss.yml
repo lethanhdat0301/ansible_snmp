@@ -1,0 +1,58 @@
+---
+- name: "Test Extreme VOSS switches connectivity and commands"
+  hosts: extreme_voss
+  gather_facts: no
+  connection: network_cli
+  tasks:
+    - name: Test 1 - Check SSH connectivity
+      wait_for_connection:
+        timeout: 30
+      register: connection_test
+
+    - name: Test 2 - Run 'show sys-info'
+      community.network.voss_command:
+        commands:
+          - show sys-info
+      register: sys_info
+
+    - name: Display system info
+      debug:
+        var: sys_info.stdout_lines
+
+    - name: Test 3 - Run 'show running-config' (first 20 lines)
+      community.network.voss_command:
+        commands:
+          - show running-config | include 20
+      register: running_config
+
+    - name: Display running config preview
+      debug:
+        var: running_config.stdout_lines
+
+    - name: Test 4 - Run 'show version'
+      community.network.voss_command:
+        commands:
+          - show version
+      register: version_info
+
+    - name: Display version
+      debug:
+        var: version_info.stdout_lines
+
+    - name: Test 5 - Check if backup directory is accessible
+      stat:
+        path: "/home/backups"
+      register: backup_dir
+      delegate_to: localhost
+
+    - name: Display backup directory status
+      debug:
+        msg: "Backup directory exists: {{ backup_dir.stat.exists }}, Writable: {{ backup_dir.stat.writeable | default('unknown') }}"
+
+    - name: Test Summary
+      debug:
+        msg:
+          - "✅ SSH Connection: Success"
+          - "✅ Command execution: Working"
+          - "✅ Backup path: {{ 'Ready' if backup_dir.stat.exists else 'Need to create' }}"
+          - "Next step: Run backup_extreme_voss.yml"
