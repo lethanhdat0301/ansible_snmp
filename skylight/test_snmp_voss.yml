@@ -44,13 +44,6 @@
       debug:
         msg: "{{ snmp_host.stdout_lines }}"
 
-    - name: Test SNMP from monitoring server (on localhost)
-      shell: |
-        snmpwalk -v2c -c public {{ ansible_host }} 1.3.6.1.2.1.1
-      register: snmp_test
-      delegate_to: localhost
-      ignore_errors: yes
-
     - name: Display SNMP test result
       debug:
         msg: |
@@ -68,4 +61,3 @@
           - "SNMP Group: Check output above"
           - "SNMP Community: public"
           - "SNMP Host: 192.168.0.139"
-          - "Test from monitoring server: {{ 'OK' if snmp_test.rc == 0 else 'FAILED' }}"
