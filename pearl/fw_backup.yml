@@ -1,0 +1,38 @@
+---
+- hosts: fortigates
+  gather_facts: yes
+  connection: httpapi
+  collections:
+    - fortinet.fortios
+  vars:
+    vdom: "root"
+    ansible_httpapi_use_ssl: yes
+    ansible_httpapi_validate_certs: no
+    ansible_httpapi_port: 8443
+    ansible_network_os: fortinet.fortios.fortios
+    fortios_access_token: "{{ lookup('env', 'FORTIOS_ACCESS_TOKEN') }}"
+
+  tasks:
+  - name: Get current time on Ansible control machine
+    local_action:
+        module: setup
+        filter: ansible_date_time
+    register: control_time
+  
+  - name: Set current date in D-M-Y format from control machine
+    set_fact:
+      current_date: "{{ control_time.ansible_facts.ansible_date_time.day }}-{{ control_time.ansible_facts.ansible_date_time.month }}-{{ control_time.ansible_facts.ansible_date_time.year }}"
+
+  - name: Backup a virtual domain.
+    fortios_monitor_fact:
+      access_token: "{{ fortios_access_token }}"
+      selector: 'system_config_backup'
+      vdom: "{{ vdom }}"
+      params:
+        scope: 'global'
+    register: backupinfo
+
+  - name: Save the backup information.
+    copy:
+      content: '{{ backupinfo.meta.raw }}'
+      dest: '/home/ansible/backups/fortigate_backups/{{ inventory_hostname }}-{{ current_date }}.cfg'

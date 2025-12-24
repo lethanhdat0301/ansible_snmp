@@ -1,0 +1,8 @@
+- name: Running bash on system
+  hosts: localhost
+  tasks:
+    - name: 'Run a python backup firewall using an executable in a system path'
+      command: python3 fw_backup.py
+      register: result
+    - debug:
+        msg: "{{ result }}"

@@ -1,0 +1,14 @@
+- name: Running copy file mysql snipeit
+  hosts: snipeit
+  tasks:
+    - name: Run backup sql snipeit
+      command: bash backup_mysql.sh
+      register: result
+    - debug:
+        msg: "{{ result }}"
+
+    - name: Fetch a file from snipe sever
+      ansible.builtin.fetch:
+        src: "~/snipeit.sql"  # Đường dẫn file trên máy remote
+        dest: "/home/backups/mysql_snipeit/"  # Đường dẫn thư mục lưu trữ trên máy Ansible
+        flat: yes  # Nếu flat là 'yes', file sẽ được lưu trực tiếp vào thư mục mà không giữ cấu trúc thư mục từ máy remote

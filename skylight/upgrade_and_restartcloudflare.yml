@@ -1,0 +1,28 @@
+---
+- name: Upgrade packages and restart cloudflared service
+  hosts: ubuntu
+  become: yes  # Yêu cầu quyền sudo
+  tasks:
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+        cache_valid_time: 3600  # Cập nhật cache nếu cache quá 1 giờ
+
+    - name: Check if cloudflared is installed
+      shell: dpkg -l | grep -qw cloudflared
+      register: cloudflared_check
+      ignore_errors: yes
+
+    - name: Upgrade cloudflared package
+      apt:
+        name: cloudflared
+        state: latest
+      when: cloudflared_check.rc == 0
+      register: cloudflared_upgrade
+
+    - name: Restart cloudflared service
+      systemd:
+        name: cloudflared
+        state: restarted
+      when: cloudflared_upgrade.changed

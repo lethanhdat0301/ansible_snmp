@@ -1,0 +1,54 @@
+# Environment variables
+.env
+*.env
+.env.local
+.env.*.local
+
+# Vault files
+vault.yml
+*_vault.yml
+vault_*.yml
+
+# Secrets
+*_secret*
+*_secrets*
+slack_webhook.txt
+webhook_*.txt
+*.key
+*.pem
+
+# Ansible specific
+*.retry
+.vault_pass*
+
+# Backup files
+*_backup_*
+
+# Added by fix script
+# Environment variables
+.env
+*.env
+.env.local
+.env.*.local
+
+# Vault files
+vault.yml
+*_vault.yml
+vault_*.yml
+
+# Secrets
+*_secret*
+*_secrets*
+slack_webhook.txt
+webhook_*.txt
+*.key
+*.pem
+
+# Ansible specific
+*.retry
+.vault_pass*
+
+# Backup files
+*_backup_*
+
+ansible/slack*.sh

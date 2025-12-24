@@ -1,0 +1,12 @@
+- name: Running bash on system
+  hosts: localhost
+  tasks:
+    - name: 'Run a python restart device switch Draytek'
+      command: python3 cbs220_reboot.py
+      async: 1000  # Tăng thời gian chờ tối đa (1000 giây)
+      poll: 0      # Không chờ kết quả
+      register: async_result
+
+    - name: Show that the command has been triggered
+      debug:
+        msg: "Python script cbs220_reboot.py has been started with Job ID {{ async_result.ansible_job_id }}. The process will continue running in the background."

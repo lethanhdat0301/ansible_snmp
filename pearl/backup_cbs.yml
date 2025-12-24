@@ -1,0 +1,30 @@
+- name: Backup Cisco CBS 350 running config
+  hosts: cbs_switch
+  gather_facts: yes
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: community.ciscosmb.ciscosmb
+    ansible_user: "{{ lookup('env', 'ansible_user') }}"
+    ansible_password: "{{ lookup('env', 'ansible_password') }}"
+
+  tasks:
+    - name: Get current time on Ansible control machine
+      local_action:
+        module: setup
+        filter: ansible_date_time
+      register: control_time
+
+    - name: Set current date in D-M-Y format from control machine
+      set_fact:
+        current_date: "{{ control_time.ansible_facts.ansible_date_time.day }}-{{ control_time.ansible_facts.ansible_date_time.month }}-{{ control_time.ansible_facts.ansible_date_time.year }}"
+
+    - name: Collect running configuration
+      community.ciscosmb.command:
+        commands:
+          - show running-config
+      register: running_config
+
+    - name: Save the running configuration to a file with device name and date
+      copy:
+        content: "{{ running_config.stdout[0] }}"
+        dest: "/home/ansible/backups/cbs/{{ inventory_hostname }}/{{ inventory_hostname }}-config-{{ current_date }}.txt"

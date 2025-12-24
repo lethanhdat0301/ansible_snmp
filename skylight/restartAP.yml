@@ -1,0 +1,20 @@
+- name: Running bash on system
+  hosts: localhost
+  tasks:
+    - name: 'Run a python restart device switch Draytek'
+      command: python3 restart_aruba.py
+      async: 350  # Tăng thời gian chờ tối đa
+      poll: 0     # Không chờ kết quả ngay lập tức
+      register: async_result
+
+    - name: Wait for the result of the long running command
+      async_status:
+        jid: "{{ async_result.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 30
+      delay: 10
+
+    - name: Show the final result
+      debug:
+        msg: "{{ job_result }}"

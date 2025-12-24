@@ -1,0 +1,8 @@
+- name: Running bash on system
+  hosts: localhost
+  tasks:
+    - name: Delete old backup file  
+      command: find backups/ -type f -mtime +5 -exec rm -rf {} \;
+      register: result
+    - debug:
+        msg: "{{ result }}"

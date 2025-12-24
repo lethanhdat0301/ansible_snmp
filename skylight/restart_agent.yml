@@ -1,0 +1,8 @@
+- name: Install Repository
+  hosts: vmware_hosts
+  tasks:
+    - name: Restart the Zabbix agent
+      service:
+        name: zabbix-agent
+        enabled: yes
+        state: restarted

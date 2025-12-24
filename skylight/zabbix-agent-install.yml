@@ -1,0 +1,17 @@
+- name: Install Repository
+  hosts: vmware_hosts
+  tasks:
+    - name: 'Install Repository and Package'
+      apt:
+        name: zabbix-agent
+        state: present
+        force_apt_get: yes
+    - name: Copy Zabbix agent configuration for Linux
+      copy:
+        src: config_zabbix_agent/centos/zabbix_agentd.conf
+        dest: /etc/zabbix/zabbix_agentd.conf
+    - name: Start the Zabbix agent
+      service:
+        name: zabbix-agent
+        enabled: yes
+        state: started

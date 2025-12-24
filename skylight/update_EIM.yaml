@@ -1,0 +1,10 @@
+- name: Running bash on system
+  hosts: snipeit
+  tasks:
+    - name: Run auto update EIM
+      command: python3 /home/snipeit/auto-update-EIM/update_daily.py
+      args:
+        chdir: /home/snipeit/auto-update-EIM
+      register: result
+    - debug:
+        msg: "{{ result }}"

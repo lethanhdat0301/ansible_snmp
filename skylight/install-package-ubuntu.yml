@@ -1,0 +1,8 @@
+- name: Install Repository
+  hosts: localhost
+  tasks:
+    - name: 'Install Package'
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        force_apt_get: true

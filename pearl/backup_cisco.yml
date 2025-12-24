@@ -1,0 +1,20 @@
+- name: "Backup configue device Cisco"
+  hosts: switch
+  gather_facts: no
+  connection: local
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_user: "{{ lookup('env', 'ansible_user') }}"
+    ansible_password: "{{ lookup('env', 'ansible_password') }}"
+
+  tasks:
+    - name: get timestamp
+      command: date +%d-%m-%Y
+      register: timestamp
+    - name: backup ios config
+      ios_config:
+        backup: yes
+        backup_options:
+          filename: "{{ inventory_hostname }}-{{ timestamp.stdout }}"
+          dir_path: "/home/ansible/backups/{{ inventory_hostname }}"

@@ -1,0 +1,12 @@
+- name: "Rest conf switch cisco L2"
+  hosts: all
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: "Get info version"
+      ios_command:
+        commands: show version 
+      register: output
+    - name: print output
+      debug:
+        var: output.stdout_lines

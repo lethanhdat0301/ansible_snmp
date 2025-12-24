@@ -1,0 +1,14 @@
+- name: "Backup configue device Cisco"
+  hosts: switch
+  gather_facts: no
+  connection: local
+  tasks:
+    - name: get timestamp
+      command: date +%d-%m-%Y
+      register: timestamp
+    - name: backup ios config
+      ios_config:
+        backup: yes
+        backup_options:
+          filename: "{{ inventory_hostname }}-{{ timestamp.stdout }}"
+          dir_path: "/home/backups/{{ inventory_hostname }}"
