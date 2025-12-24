@@ -1,13 +1,13 @@
 ---
-- name: "Test Extreme VOSS switches connectivity and commands"
-  hosts: extreme_voss
+- name: Test Extreme VOSS switches connectivity and commands
+  hosts: extreme_switches
   gather_facts: no
   connection: network_cli
+
   tasks:
     - name: Test 1 - Check SSH connectivity
       wait_for_connection:
         timeout: 30
-      register: connection_test
 
     - name: Test 2 - Run 'show sys-info'
       community.network.voss_command:
@@ -19,15 +19,15 @@
       debug:
         var: sys_info.stdout_lines
 
-    - name: Test 3 - Run 'show running-config' (first 20 lines)
+    - name: Test 3 - Run 'show running-config'
       community.network.voss_command:
         commands:
-          - show running-config | include 20
+          - show running-config
       register: running_config
 
-    - name: Display running config preview
+    - name: Display running config preview (first 20 lines)
       debug:
-        var: running_config.stdout_lines
+        msg: "{{ running_config.stdout_lines[0][:20] }}"
 
     - name: Test 4 - Run 'show version'
       community.network.voss_command:
@@ -47,12 +47,14 @@
 
     - name: Display backup directory status
       debug:
-        msg: "Backup directory exists: {{ backup_dir.stat.exists }}, Writable: {{ backup_dir.stat.writeable | default('unknown') }}"
+        msg: >
+          Backup directory exists: {{ backup_dir.stat.exists }},
+          Writable: {{ backup_dir.stat.writeable | default('unknown') }}
 
     - name: Test Summary
       debug:
         msg:
           - "✅ SSH Connection: Success"
-          - "✅ Command execution: Working"
+          - "✅ VOSS CLI command execution: Working"
           - "✅ Backup path: {{ 'Ready' if backup_dir.stat.exists else 'Need to create' }}"
           - "Next step: Run backup_extreme_voss.yml"
