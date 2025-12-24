@@ -1,6 +1,6 @@
 ---
 - name: "Test SNMP configuration on Extreme VOSS switches"
-  hosts: extreme_voss
+  hosts: extreme_switches
   gather_facts: no
   connection: network_cli
   tasks:
