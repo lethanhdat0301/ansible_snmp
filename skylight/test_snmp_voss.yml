@@ -44,13 +44,6 @@
       debug:
         msg: "{{ snmp_host.stdout_lines }}"
 
-    - name: Display SNMP test result
-      debug:
-        msg: |
-          SNMP Test from 192.168.0.139:
-          {{ 'SUCCESS - SNMP responding' if snmp_test.rc == 0 else 'FAILED - Check firewall/SNMP config' }}
-          Output: {{ snmp_test.stdout_lines | default(['No output']) }}
-
     - name: Summary
       debug:
         msg:
